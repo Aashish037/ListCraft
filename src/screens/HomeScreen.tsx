@@ -3,81 +3,92 @@ import React, { useState } from 'react'
 import Allitems from './Allitems'
 import CreateScreen from './CreateScreen'
 
-
 const HomeScreen = () => {
-
     const [view, setView] = useState(0)
+    const [items, setItems] = useState([
+        { id: 1, name: 'Item A', quantity: 5 },
+        { id: 2, name: 'Item B', quantity: 2 },
+        { id: 3, name: 'Item C', quantity: 10 },
+    ])
+
+    const addItem = (item: { name: string; quantity: number }) => {
+        const newItem = { id: Date.now(), ...item }
+        setItems(prev => [...prev, newItem])
+    }
+
+    const deleteItem = (id: number) => {
+        setItems(prev => prev.filter(item => item.id !== id))
+    }
+
+    const editItem = (id: number, updated: { name: string; quantity: number }) => {
+        setItems(prev => prev.map(item =>
+            item.id === id ? { ...item, ...updated } : item
+        ))
+    }
+
+    const filteredItems = view === 1
+        ? items.filter(item => item.quantity <= 3)
+        : items
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Dashbooard</Text>
-            <View style={styles.buttonContainer}>
-                <Pressable
-                    style={[
-                        styles.button,
-                        view === 0 ? styles.selectedButton : null
-                    ]}
-                    onPress={() => setView(0)}
-                    >
-                    <Text style={[styles.buttonText, view===0 ? styles.selectedText : null]}>All Items</Text>
-                </Pressable>
+            <Text style={styles.title}>Dashboard</Text>
 
-                <Pressable
-                    style={[
-                        styles.button,
-                        view === 1 ? styles.selectedButton : null
-                    ]}
-                    onPress={() => setView(1)}
-                    >
-                    <Text style={[styles.buttonText, view===1 ? styles.selectedText : null]}>Low Stock</Text>
-                </Pressable>
-                
-                <Pressable
-                    style={[
-                        styles.button,
-                        view === 2 ? styles.selectedButton : null
-                    ]}
-                    onPress={() => setView(2)}
-                    >
-                    <Text style={[styles.buttonText, view===2 ? styles.selectedText : null]}>Create</Text>
-                </Pressable>
+            <View style={styles.buttonContainer}>
+                <TabButton title="All Items" isSelected={view === 0} onPress={() => setView(0)} />
+                <TabButton title="Low Stock" isSelected={view === 1} onPress={() => setView(1)} />
+                <TabButton title="Create" isSelected={view === 2} onPress={() => setView(2)} />
             </View>
 
-            {view ===0 && <Allitems/>}
-            {view ===1 && <Allitems/>}
-            {view ===2 && <CreateScreen />}
+            {view === 0 || view === 1 ? (
+                <Allitems items={filteredItems} onDelete={deleteItem} onEdit={editItem} />
+            ) : (
+                <CreateScreen onAdd={addItem} />
+            )}
         </View>
     )
 }
+
+type TabButtonProps = {
+    title: string
+    isSelected: boolean
+    onPress: () => void
+}
+
+const TabButton = ({ title, isSelected, onPress }: TabButtonProps) => (
+    <Pressable
+        style={[styles.button, isSelected && styles.selectedButton]}
+        onPress={onPress}
+    >
+        <Text style={[styles.buttonText, isSelected && styles.selectedText]}>{title}</Text>
+    </Pressable>
+)
 
 export default HomeScreen
 
 const styles = StyleSheet.create({
     container: {
-        width: '100%',
-        height: '100%',
-        backgroundColor: '#ffffff',
-        padding: "4%",
         flex: 1,
-        justifyContent: 'center',
+        padding: "5%",
         alignItems: 'center',
+        backgroundColor: '#fff',
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#333',
-        
+        color: '#2e7d32',
+        marginBottom: 20,
     },
     buttonContainer: {
         flexDirection: 'row',
         gap: 10,
-        marginVertical: 10,
+        marginBottom: 15,
     },
     button: {
-        paddingVertical:3.5,
-        paddingHorizontal: 10,
+        paddingVertical: 6,
+        paddingHorizontal: 14,
         borderRadius: 50,
-        borderWidth: 0.8,
+        borderWidth: 1,
         borderColor: 'green',
     },
     selectedButton: {
@@ -85,10 +96,9 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: 'green',
-        fontSize: 12,
+        fontSize: 14,
     },
     selectedText: {
         color: '#fff',
-        fontSize: 12,
-    }
+    },
 })
