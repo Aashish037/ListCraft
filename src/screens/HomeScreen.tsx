@@ -6,25 +6,24 @@ import CreateScreen from './CreateScreen'
 const HomeScreen = () => {
     const [view, setView] = useState(0)
     const [items, setItems] = useState([
-        { id: 1, name: 'Item A', quantity: 5 },
-        { id: 2, name: 'Item B', quantity: 2 },
-        { id: 3, name: 'Item C', quantity: 10 },
-    ])
+    { id: 1, name: 'Item A', quantity: 5, unit: 'kg' },
+    { id: 2, name: 'Item B', quantity: 2, unit: 'dozen' },
+    { id: 3, name: 'Item C', quantity: 10, unit: 'pcs' },
+])
 
-    const addItem = (item: { name: string; quantity: number }) => {
-        const newItem = { id: Date.now(), ...item }
-        setItems(prev => [...prev, newItem])
-    }
+    const addItem = (item: { name: string; quantity: number; unit: string }) => {
+    const newItem = { id: Date.now(), ...item }
+    setItems(prev => [...prev, newItem])
+}
 
     const deleteItem = (id: number) => {
         setItems(prev => prev.filter(item => item.id !== id))
     }
 
-    const editItem = (id: number, updated: { name: string; quantity: number }) => {
-        setItems(prev => prev.map(item =>
-            item.id === id ? { ...item, ...updated } : item
-        ))
-    }
+    const editItem = (id: number, updated: { name: string; quantity: number; unit: string }) => {
+    setItems(prev => prev.map(item =>
+        item.id === id ? { ...item, ...updated } : item))
+}
 
     const filteredItems = view === 1
         ? items.filter(item => item.quantity <= 3)
@@ -67,38 +66,40 @@ const TabButton = ({ title, isSelected, onPress }: TabButtonProps) => (
 export default HomeScreen
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: "5%",
-        alignItems: 'center',
-        backgroundColor: '#fff',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#2e7d32',
-        marginBottom: 20,
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        gap: 10,
-        marginBottom: 15,
-    },
-    button: {
-        paddingVertical: 6,
-        paddingHorizontal: 14,
-        borderRadius: 50,
-        borderWidth: 1,
-        borderColor: 'green',
-    },
-    selectedButton: {
-        backgroundColor: 'green',
-    },
-    buttonText: {
-        color: 'green',
-        fontSize: 14,
-    },
-    selectedText: {
-        color: '#fff',
-    },
+  container: {
+    flex: 1,
+    paddingTop: 50, // ensures space from top
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: 'green',
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+    marginBottom: 20,
+  },
+  button: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'green',
+  },
+  selectedButton: {
+    backgroundColor: 'green',
+  },
+  buttonText: {
+    color: 'green',
+    fontSize: 16,
+  },
+  selectedText: {
+    color: '#fff',
+  },
 })

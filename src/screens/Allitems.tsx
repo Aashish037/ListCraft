@@ -14,12 +14,13 @@ type Item = {
     id: number
     name: string
     quantity: number
+    unit?: string // Optional unit field
 }
 
 type AllitemsProps = {
     items: Item[]
     onDelete: (id: number) => void
-    onEdit: (id: number, updated: { name: string; quantity: number }) => void
+    onEdit: (id: number, updated: { name: string; quantity: number; unit: string }) => void
 }
 
 const Allitems: React.FC<AllitemsProps> = ({ items, onDelete, onEdit }) => {
@@ -27,23 +28,26 @@ const Allitems: React.FC<AllitemsProps> = ({ items, onDelete, onEdit }) => {
     const [currentItem, setCurrentItem] = useState<Item | null>(null)
     const [editedName, setEditedName] = useState('')
     const [editedQty, setEditedQty] = useState('')
+    const [editedUnit, setEditedUnit] = useState('')
 
     const openEditModal = (item: Item) => {
         setCurrentItem(item)
         setEditedName(item.name)
         setEditedQty(String(item.quantity))
+        setEditedUnit(item.unit || '')
         setEditModalVisible(true)
     }
 
-    const handleEdit = () => {
-        if (currentItem && editedName && editedQty) {
-            onEdit(currentItem.id, {
-                name: editedName,
-                quantity: parseInt(editedQty, 10),
-            })
-            setEditModalVisible(false)
-        }
+   const handleEdit = () => {
+    if (currentItem && editedName && editedQty) {
+        onEdit(currentItem.id, {
+            name: editedName,
+            quantity: parseInt(editedQty, 10),
+            unit: editedUnit,
+        })
+        setEditModalVisible(false)
     }
+}
 
     return (
         <View style={styles.container}>
@@ -56,7 +60,7 @@ const Allitems: React.FC<AllitemsProps> = ({ items, onDelete, onEdit }) => {
                     renderItem={({ item }) => (
                         <View style={styles.item}>
                             <Text style={styles.itemText}>
-                                {item.name} - Qty: {item.quantity}
+                                {item.name} - {item.quantity} {item.unit || ''}
                             </Text>
                             <View style={styles.actions}>
                                 <Pressable
@@ -94,6 +98,12 @@ const Allitems: React.FC<AllitemsProps> = ({ items, onDelete, onEdit }) => {
                             keyboardType="number-pad"
                             style={styles.input}
                             placeholder="Quantity"
+                        />
+                        <TextInput
+                            value={editedUnit}
+                            onChangeText={setEditedUnit}
+                            style={styles.input}
+                            placeholder="Unit (e.g. kg, dozen)"
                         />
                         <View style={styles.modalButtons}>
                             <Pressable style={styles.modalBtn} onPress={handleEdit}>

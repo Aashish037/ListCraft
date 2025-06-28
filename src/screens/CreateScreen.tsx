@@ -2,18 +2,20 @@ import { StyleSheet, Text, View, TextInput, Pressable } from 'react-native'
 import React, { useState } from 'react'
 
 type CreateScreenProps = {
-    onAdd: (item: { name: string; quantity: number }) => void
+    onAdd: (item: { name: string; quantity: number; unit: string }) => void
 }
 
 const CreateScreen = ({ onAdd }: CreateScreenProps) => {
     const [name, setName] = useState('')
     const [quantity, setQuantity] = useState('')
+    const [unit, setUnit] = useState('') // Default unit
 
     const handleSubmit = () => {
         if (!name || !quantity) return
-        onAdd({ name, quantity: parseInt(quantity, 10) })
+        onAdd({ name, quantity: parseInt(quantity, 10), unit })
         setName('')
         setQuantity('')
+        setUnit('') // Reset unit after adding
     }
 
     return (
@@ -31,6 +33,12 @@ const CreateScreen = ({ onAdd }: CreateScreenProps) => {
                 keyboardType="number-pad"
                 style={styles.input}
             />
+            <TextInput
+                placeholder="Unit (e.g. kg, dozen)"
+                value={unit}
+                onChangeText={setUnit}
+                style={styles.input}
+            />
             <Pressable style={styles.addButton} onPress={handleSubmit}>
                 <Text style={styles.addText}>Add Item</Text>
             </Pressable>
@@ -44,23 +52,27 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         alignItems: 'center',
+        marginTop: 40,
     },
     input: {
         width: '90%',
-        padding: 10,
+        height: 50,
+        padding: 12,
         borderColor: 'green',
         borderWidth: 1,
         borderRadius: 6,
-        marginBottom: 10,
+        marginBottom: 15,
+        fontSize: 16,
     },
     addButton: {
         backgroundColor: 'green',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
+        paddingVertical: 12,
+        paddingHorizontal: 30,
         borderRadius: 6,
     },
     addText: {
         color: '#fff',
+        fontSize: 16,
         fontWeight: 'bold',
     },
 })
