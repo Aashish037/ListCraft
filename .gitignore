@@ -80,3 +80,6 @@ env
 .env
 .env.local
 .env.production
+
+# Config files with sensitive data
+src/config/supabase-config.ts
