@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@react-native/new-app-screen": "0.80.0",
+    "@supabase/supabase-js": "^2.50.2",
     "drizzle-orm": "^0.44.2",
     "postgres": "^3.4.7",
     "react": "19.1.0",
-    "react-native": "0.80.0"
+    "react-native": "0.80.0",
+    "react-native-dotenv": "^3.4.11"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -29,6 +31,7 @@
     "@react-native/typescript-config": "0.80.0",
     "@types/jest": "^29.5.13",
     "@types/react": "^19.1.0",
+    "@types/react-native-dotenv": "^0.2.2",
     "@types/react-test-renderer": "^19.1.0",
     "drizzle-kit": "^0.31.4",
     "eslint": "^8.19.0",

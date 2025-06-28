@@ -1,29 +1,76 @@
-import { StyleSheet, Text, View, Pressable } from 'react-native'
-import React, { useState } from 'react'
+import { StyleSheet, Text, View, Pressable, Alert } from 'react-native'
+import React, { useState, useEffect } from 'react'
 import Allitems from './Allitems'
 import CreateScreen from './CreateScreen'
+import { ItemServiceDirect } from '../services/ItemServiceDirect'
+import { Item, ItemInsert, ItemUpdate } from '../lib/supabase'
 
 const HomeScreen = () => {
     const [view, setView] = useState(0)
-    const [items, setItems] = useState([
-    { id: 1, name: 'Item A', quantity: 5, unit: 'kg' },
-    { id: 2, name: 'Item B', quantity: 2, unit: 'dozen' },
-    { id: 3, name: 'Item C', quantity: 10, unit: 'pcs' },
-])
+    const [items, setItems] = useState<Item[]>([])
+    const [loading, setLoading] = useState(false)
 
-    const addItem = (item: { name: string; quantity: number; unit: string }) => {
-    const newItem = { id: Date.now(), ...item }
-    setItems(prev => [...prev, newItem])
-}
+    // Load items when component mounts
+    useEffect(() => {
+        loadItems()
+    }, [])
 
-    const deleteItem = (id: number) => {
-        setItems(prev => prev.filter(item => item.id !== id))
+    const loadItems = async () => {
+        try {
+            console.log('🔄 Starting to load items...');
+            setLoading(true)
+            const data = await ItemServiceDirect.getAllItems()
+            console.log('✅ Items loaded successfully:', data?.length || 0, 'items');
+            setItems(data)
+        } catch (error) {
+            console.error('❌ Error loading items:', error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            Alert.alert('Error', `Failed to load items: ${errorMessage}`)
+        } finally {
+            setLoading(false)
+        }
     }
 
-    const editItem = (id: number, updated: { name: string; quantity: number; unit: string }) => {
-    setItems(prev => prev.map(item =>
-        item.id === id ? { ...item, ...updated } : item))
-}
+    const addItem = async (item: ItemInsert) => {
+        try {
+            setLoading(true)
+            const newItem = await ItemServiceDirect.addItem(item)
+            setItems(prev => [...prev, newItem])
+        } catch (error) {
+            Alert.alert('Error', 'Failed to add item')
+            console.error('Error adding item:', error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const deleteItem = async (id: number) => {
+        try {
+            setLoading(true)
+            await ItemServiceDirect.deleteItem(id)
+            setItems(prev => prev.filter(item => item.id !== id))
+        } catch (error) {
+            Alert.alert('Error', 'Failed to delete item')
+            console.error('Error deleting item:', error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const editItem = async (id: number, updated: ItemUpdate) => {
+        try {
+            setLoading(true)
+            const updatedItem = await ItemServiceDirect.updateItem(id, updated)
+            setItems(prev => prev.map(item =>
+                item.id === id ? updatedItem : item
+            ))
+        } catch (error) {
+            Alert.alert('Error', 'Failed to update item')
+            console.error('Error updating item:', error)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const filteredItems = view === 1
         ? items.filter(item => item.quantity <= 3)
@@ -39,10 +86,18 @@ const HomeScreen = () => {
                 <TabButton title="Create" isSelected={view === 2} onPress={() => setView(2)} />
             </View>
 
+            {loading && <Text style={styles.loadingText}>Loading...</Text>}
+
             {view === 0 || view === 1 ? (
-                <Allitems items={filteredItems} onDelete={deleteItem} onEdit={editItem} />
+                <Allitems 
+                    items={filteredItems} 
+                    onDelete={deleteItem} 
+                    onEdit={editItem}
+                />
             ) : (
-                <CreateScreen onAdd={addItem} />
+                <CreateScreen 
+                    onAdd={addItem} 
+                />
             )}
         </View>
     )
@@ -101,5 +156,10 @@ const styles = StyleSheet.create({
   },
   selectedText: {
     color: '#fff',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+    marginVertical: 10,
   },
 })

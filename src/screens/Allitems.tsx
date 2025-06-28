@@ -14,13 +14,13 @@ type Item = {
     id: number
     name: string
     quantity: number
-    unit?: string // Optional unit field
+    unit: string
 }
 
 type AllitemsProps = {
     items: Item[]
-    onDelete: (id: number) => void
-    onEdit: (id: number, updated: { name: string; quantity: number; unit: string }) => void
+    onDelete: (id: number) => Promise<void>
+    onEdit: (id: number, updated: { name: string; quantity: number; unit: string }) => Promise<void>
 }
 
 const Allitems: React.FC<AllitemsProps> = ({ items, onDelete, onEdit }) => {
@@ -38,9 +38,9 @@ const Allitems: React.FC<AllitemsProps> = ({ items, onDelete, onEdit }) => {
         setEditModalVisible(true)
     }
 
-   const handleEdit = () => {
+   const handleEdit = async () => {
     if (currentItem && editedName && editedQty) {
-        onEdit(currentItem.id, {
+        await onEdit(currentItem.id, {
             name: editedName,
             quantity: parseInt(editedQty, 10),
             unit: editedUnit,

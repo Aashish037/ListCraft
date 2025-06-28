@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, TextInput, Pressable } from 'react-native'
 import React, { useState } from 'react'
 
 type CreateScreenProps = {
-    onAdd: (item: { name: string; quantity: number; unit: string }) => void
+    onAdd: (item: { name: string; quantity: number; unit: string }) => Promise<void>
 }
 
 const CreateScreen = ({ onAdd }: CreateScreenProps) => {
@@ -10,9 +10,9 @@ const CreateScreen = ({ onAdd }: CreateScreenProps) => {
     const [quantity, setQuantity] = useState('')
     const [unit, setUnit] = useState('') // Default unit
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!name || !quantity) return
-        onAdd({ name, quantity: parseInt(quantity, 10), unit })
+        await onAdd({ name, quantity: parseInt(quantity, 10), unit })
         setName('')
         setQuantity('')
         setUnit('') // Reset unit after adding
